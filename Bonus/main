@@ -1,0 +1,215 @@
+#!/usr/bin/env python3
+##
+## EPITECH PROJECT, 2019
+## pong
+## File description:
+## pong
+##
+
+import pygame
+import sys
+from pygame import locals as const
+from random import randint
+
+RIEN = -1
+HAUT = 0
+BAS = 1
+Z = 0
+S = 1
+VITESSE_RAQUETTE = 20
+VITESSE_BALLE = 0.5
+
+class Game:
+    def __init__(self, ecran: pygame.Surface):
+        self.ecran = ecran
+        self.raquette = Raquette(self.ecran)
+        self.raquette2 = Raquette2(self.ecran)
+        # self.raquette3 = Raquette3(self.ecran)
+        self.balle = Balle(self.ecran)
+        self.continuer = True
+        self.controles = {
+            HAUT: const.K_UP,
+            BAS: const.K_DOWN
+        }
+        self.controles2 = {
+            Z: const.K_z,
+            S: const.K_s
+        }
+
+    def prepare(self):
+        pygame.key.set_repeat(200, 50)
+        self.continuer = True
+        self.raquette = Raquette(self.ecran)
+        self.raquette2 = Raquette2(self.ecran)
+        # self.raquette3 = Raquette3(self.ecran)
+        self.balle = Balle(self.ecran)
+
+    def update_screen(self):
+        pygame.draw.rect(self.ecran, (0, 0, 0), (0, 0) + self.ecran.get_size())
+        pygame.draw.rect(self.ecran, (255, 255, 255), (self.ecran.get_width() // 2 - 1, 0, 2, self.ecran.get_height()))
+        self.raquette.render()
+        self.raquette2.render()
+        # self.raquette3.render()
+        self.balle.render()
+
+    def process_event(self, event: pygame.event):
+        if event.type == const.KEYDOWN:
+            if event.key == self.controles[HAUT]:
+                self.raquette.move(HAUT)
+            if event.key == self.controles[BAS]:
+                self.raquette.move(BAS)
+            if event.key == self.controles2[Z]:
+                self.raquette2.move(Z)
+            if event.key == self.controles2[S]:
+                self.raquette2.move(S)
+        if event.type == const.QUIT:
+            self.continuer = False
+
+    def start(self):
+        self.prepare()
+        while self.continuer:
+            for event in pygame.event.get():
+                self.process_event(event)
+            self.update_screen()
+            self.balle.move(self.raquette)
+            self.balle.move(self.raquette2)
+            # self.balle.move(self.raquette3)
+            pygame.display.flip()
+
+class Raquette:
+    def __init__(self, ecran: pygame.Surface):
+        self.ecran = ecran
+        self.ecran_large = self.ecran.get_width()
+        self.ecran_haut = self.ecran.get_height()
+        self.image = pygame.image.load("perso.png").convert_alpha()
+        self.pos = [20, (self.ecran_haut - self.image.get_height()) // 2]
+
+    def render(self):
+        self.ecran.blit(self.image, self.pos)
+
+    def move(self, dir: int=RIEN):
+        if dir == HAUT:
+            if self.pos[1] - VITESSE_RAQUETTE >= 0:
+                self.pos[1] -= VITESSE_RAQUETTE
+            else:
+                self.pos[1] = 0
+        elif dir == BAS:
+            if self.pos[1] + VITESSE_RAQUETTE <= self.ecran_haut - self.image.get_height():
+                self.pos[1] += VITESSE_RAQUETTE
+            else:
+                self.pos[1] = self.ecran_haut - self.image.get_height()
+
+    def collide_with_me(self, pos_objet: tuple, taille_objet: tuple):
+        if self.pos[0] <= pos_objet[0] <= self.pos[0] + self.image.get_width() and self.pos[1] <= pos_objet[1] <= self.pos[1] + self.image.get_height():
+            return True
+        elif self.pos[0] <= pos_objet[0] + taille_objet[0] <= self.pos[0] + self.image.get_width() and self.pos[1] <= pos_objet[1] + taille_objet[1] <= self.pos[1] + self.image.get_height():
+            return True
+        return False
+
+class Raquette2:
+    def __init__(self, ecran: pygame.Surface):
+        self.ecran = ecran
+        self.ecran_large = self.ecran.get_width()
+        self.ecran_haut = self.ecran.get_height()
+        self.image = pygame.image.load("perso.png").convert_alpha()
+        self.pos = [760, (self.ecran_haut - self.image.get_height()) // 2]
+
+    def render(self):
+        self.ecran.blit(self.image, self.pos)
+
+    def move(self, dir: int=RIEN):
+        if dir == HAUT:
+            if self.pos[1] - VITESSE_RAQUETTE >= 0:
+                self.pos[1] -= VITESSE_RAQUETTE
+            else:
+                self.pos[1] = 0
+        elif dir == BAS:
+            if self.pos[1] + VITESSE_RAQUETTE <= self.ecran_haut - self.image.get_height():
+                self.pos[1] += VITESSE_RAQUETTE
+            else:
+                self.pos[1] = self.ecran_haut - self.image.get_height()
+
+    def collide_with_me(self, pos_objet: tuple, taille_objet: tuple):
+        if self.pos[0] <= pos_objet[0] <= self.pos[0] + self.image.get_width() and self.pos[1] <= pos_objet[1] <= self.pos[1] + self.image.get_height():
+            return True
+        elif self.pos[0] <= pos_objet[0] + taille_objet[0] <= self.pos[0] + self.image.get_width() and self.pos[1] <= pos_objet[1] + taille_objet[1] <= self.pos[1] + self.image.get_height():
+            return True
+        return False
+
+# class Raquette3:
+#     def __init__(self, ecran: pygame.Surface):
+#         self.ecran = ecran
+#         self.ecran_large = self.ecran.get_width()
+#         self.ecran_haut = self.ecran.get_height()
+#         self.image = pygame.image.load("truc_en_haut.jpg").convert_alpha()
+#         self.pos = [200,(self.ecran_haut - self.image.get_height()) // 2]
+
+#     def render(self):
+#         self.ecran.blit(self.image, self.pos)
+
+#     def move(self, dir: int=RIEN):
+#         if dir == HAUT:
+#             if self.pos[1] - VITESSE_RAQUETTE >= 0:
+#                 self.pos[1] -= VITESSE_RAQUETTE
+#             else:
+#                 self.pos[1] = 0
+#         elif dir == BAS:
+#             if self.pos[1] + VITESSE_RAQUETTE <= self.ecran_haut - self.image.get_height():
+#                 self.pos[1] += VITESSE_RAQUETTE
+#             else:
+#                 self.pos[1] = self.ecran_haut - self.image.get_height()
+
+#     def collide_with_it(self, pos_objet: tuple, taille_objet: tuple):
+#         if self.pos[0] <= pos_objet[0] <= self.pos[0] + self.image.get_width() and self.pos[1] <= pos_objet[1] <= self.pos[1] + self.image.get_height():
+#             return True
+#         elif self.pos[0] >= pos_objet[0] + taille_objet[0] >= self.pos[0] + self.image.get_width() and self.pos[1] >= pos_objet[1] + taille_objet[1] >= self.pos[1] + self.image.get_height():
+#             return True
+#         return False
+
+class Balle:
+    def __init__(self, ecran: pygame.Surface):
+        self.ecran = ecran
+        self.vect_dir = [-VITESSE_BALLE, VITESSE_BALLE]
+        self.image = pygame.image.load("ball.png").convert_alpha()
+        self.b_large = self.image.get_width()
+        self.b_haut = self.image.get_height()
+        self.pos = [(self.ecran.get_width() - self.b_large) // 2, (self.ecran.get_height() - self.b_haut) // 2]
+
+    def move(self, raquette):
+        self.pos[0] += self.vect_dir[0] * VITESSE_BALLE
+        self.pos[1] += self.vect_dir[1] * VITESSE_BALLE
+
+        collision = raquette.collide_with_me(self.pos, (self.b_large, self.b_haut))
+        #collision2 = raquette3.collide_with_it(self.pos, (self.b_large, self.b_haut))
+        if collision or self.pos[0] <= 0 or self.pos[0] + self.b_large >= self.ecran.get_width():
+            self.vect_dir[0] = - self.vect_dir[0]
+            self.vect_dir[1] = self.vect_dir[1]
+        if self.pos[1] <= 0 or self.pos[1] + self.b_haut >= self.ecran.get_height():
+            self.vect_dir[0] = self.vect_dir[0]
+            self.vect_dir[1] = - self.vect_dir[1]
+
+    def render(self):
+        self.ecran.blit(self.image, self.pos)
+
+def main():
+    pygame.init()
+
+    fenetre = pygame.display.set_mode((800, 600))
+    fond = pygame.image.load("sketch.jpg").convert_alpha()
+    continuer = True
+    jeu = Game(fenetre)
+
+    while continuer:
+        for event in pygame.event.get():
+            if event.type == const.QUIT or (event.type == const.KEYDOWN and event.key == const.K_ESCAPE):
+                continuer = 0
+                sys.exit(0)
+            if event.type == const.KEYDOWN:
+                jeu.start()
+
+        fenetre.blit(fond, (0, 0))
+        pygame.display.flip()
+    pygame.quit()
+
+if __name__ == '__main__':
+    main()

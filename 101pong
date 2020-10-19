@@ -1,0 +1,110 @@
+#!/usr/bin/env python3
+##
+## EPITECH PROJECT, 2019
+## pong
+## File description:
+## python
+##
+import sys
+import math
+
+def is_float(string):
+        try:
+            float(string)
+            return 1
+        except ValueError:
+            return 0
+i=1
+while (i < 8):
+    if (len(sys.argv) < 8 or len(sys.argv) > 8):
+        print("Error")
+        sys.exit(84)
+    if (sys.argv[i].isdigit() == False):
+        if(is_float(sys.argv[i]) == False):
+            print("Error")
+            sys.exit(84)
+    i=i+1
+
+if (sys.argv[7][0] == '-'):
+        print("Error")
+        sys.exit(84)
+
+try:
+    val = int(sys.argv[7])
+except ValueError:
+    print("Error")
+    sys.exit(84)
+
+Vecteur1 = [float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[3])]
+Vecteur2 = [float(sys.argv[4]), float(sys.argv[5]), float(sys.argv[6])]
+m = float(sys.argv[7])
+z0 = float(sys.argv[6])
+
+def vec_sum(Vecteur1, Vecteur2):
+    Vecteur = [Vecteur1[0] + Vecteur2[0],
+               Vecteur1[1] + Vecteur2[1],
+               Vecteur1[2] + Vecteur2[2]]
+    return(Vecteur[0],Vecteur[1],Vecteur[2])
+
+def vec_sus(Vecteur1, Vecteur2):
+    Vecteur = [Vecteur1[0] - Vecteur2[0],
+               Vecteur1[1] - Vecteur2[1],
+               Vecteur1[2] - Vecteur2[2]]
+    return(Vecteur[0],Vecteur[1],Vecteur[2])
+
+def vec_mult(Vecteur, m):
+    Vecteur = [Vecteur[0] * m,
+               Vecteur[1] * m,
+               Vecteur[2] * m]
+    return(Vecteur[0],Vecteur[1],Vecteur[2])
+
+def vec_norm(Vecteur):
+    Vecteur = [Vecteur[0] ** 2, Vecteur[1] ** 2, Vecteur[2] ** 2]
+    Vecteur = Vecteur[0] + Vecteur[1] + Vecteur[2]
+    Vecteur = math.sqrt(Vecteur)
+    return(Vecteur)
+
+def display(Vecteur):
+    print("(" + format(Vecteur[0], '.2f')
+          + ", " + format(Vecteur[1], '.2f')
+          + ", " + format(Vecteur[2], '.2f') + ")")
+
+def pos_ball(velocity, m, Vecteur2):
+    Vecteur = vec_mult(velocity, m)
+    Vecteur = vec_sum(Vecteur, Vecteur2)
+    return(Vecteur)
+
+velocity = vec_sus(Vecteur2, Vecteur1)
+if (vec_norm(velocity) == 0):
+        print("Error")
+        sys.exit(84)
+
+def angle():
+    Teta = math.asin(velocity[2] / vec_norm(velocity))
+    Teta = 180 * Teta
+    Teta = Teta / math.pi
+    Teta = math.fabs(Teta)
+    return(Teta)
+
+def ball_paddle():
+    if (z0 > 0):
+        if ((z0 - z1) > 0):
+            print("The incidence angle is:")
+            print(format(Teta, '.2f') + " degrees")
+        else:
+            print("The ball won't reach the paddle.")
+    elif (z0 < 0):
+        if ((z0 - z1) < 0):
+            print("The incidence angle is:")
+        else:
+            print("The ball won't reach the paddle.")
+
+ball = pos_ball(velocity, m, Vecteur2)
+Teta = angle()
+z1 = ball[2]
+
+print("The velocity vector of the ball is:")
+display(velocity)
+print("At time t + " + sys.argv[7] + ", ball coordinates will be:")
+display(ball)
+ball_paddle()
